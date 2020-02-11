@@ -76,8 +76,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	@CheckSecurity.UsuariosGruposPermissoes.PodeAlterarUsuario
 	@Override
 	@PutMapping("/{usuarioId}")
-	public UsuarioModel atualizar(@PathVariable Long usuarioId,
-			@RequestBody @Valid UsuarioInput usuarioInput) {
+	public UsuarioModel atualizar(@PathVariable Long usuarioId,	@RequestBody @Valid UsuarioInput usuarioInput) {
 		Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(usuarioId);
 		usuarioInputDisassembler.copyToDomainObject(usuarioInput, usuarioAtual);
 		usuarioAtual = cadastroUsuario.salvar(usuarioAtual);

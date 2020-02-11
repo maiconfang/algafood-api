@@ -8,7 +8,6 @@ public class SecurityController {
 
 	@GetMapping("/login")
 	public String login() {
-		System.out.println("ddddd");
 		return "pages/login";
 	}
 	

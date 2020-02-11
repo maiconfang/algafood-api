@@ -1,10 +1,12 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.ModeloModel;
 import com.algaworks.algafood.api.v1.model.input.ModeloInput;
+import com.algaworks.algafood.domain.filter.ModeloFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,8 @@ import io.swagger.annotations.ApiResponses;
 public interface ModeloControllerOpenApi {
 
 	@ApiOperation("Lista os modelos")
-	CollectionModel<ModeloModel> listar();
+	PagedModel<ModeloModel> listar(ModeloFilter filtro, Pageable pageable);
+	//PagedModel<ModeloModel> pesquisar(ModeloFilter filtro, Pageable pageable);
 
 	@ApiOperation("Busca um modelo por ID")
 	@ApiResponses({

@@ -10,6 +10,10 @@ import lombok.Setter;
 @Getter
 public class ModeloInput {
 
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
+	
 	@ApiModelProperty(example = "Nissan", required = true)
 	@NotBlank
 	private String nome;

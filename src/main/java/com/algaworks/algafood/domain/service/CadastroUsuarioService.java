@@ -41,7 +41,7 @@ public class CadastroUsuarioService {
 		}
 		
 		return usuarioRepository.save(usuario);
-	}
+	} 
 	
 	@Transactional
 	public void alterarSenha(Long usuarioId, String senhaAtual, String novaSenha) {

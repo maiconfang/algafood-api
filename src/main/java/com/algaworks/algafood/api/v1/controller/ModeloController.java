@@ -1,11 +1,15 @@
 package com.algaworks.algafood.api.v1.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,10 +27,14 @@ import com.algaworks.algafood.api.v1.assembler.ModeloModelAssembler;
 import com.algaworks.algafood.api.v1.model.ModeloModel;
 import com.algaworks.algafood.api.v1.model.input.ModeloInput;
 import com.algaworks.algafood.api.v1.openapi.controller.ModeloControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
+import com.algaworks.algafood.domain.filter.ModeloFilter;
 import com.algaworks.algafood.domain.model.Modelo;
 import com.algaworks.algafood.domain.repository.ModeloRepository;
 import com.algaworks.algafood.domain.service.CadastroModeloService;
+import com.algaworks.algafood.infrastructure.repository.spec.ModeloSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/modelos", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,14 +52,30 @@ public class ModeloController implements ModeloControllerOpenApi {
 	@Autowired
 	private ModeloInputDisassembler modeloInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<Modelo> pagedResourcesAssembler;
+	
+	
 	@CheckSecurity.Modelos.PodeConsultar
 	@Override
 	@GetMapping
-	public CollectionModel<ModeloModel> listar() {
-		List<Modelo> todosModelos = modeloRepository.findAll();
+	public PagedModel<ModeloModel> listar(ModeloFilter filtro, Pageable pageable) {
 		
-		return modeloModelAssembler.toCollectionModel(todosModelos);
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<Modelo> modelosPage = null;
+		
+		if(filtro.getNome()!=null ) {
+			modelosPage = modeloRepository.findAll(ModeloSpecs.comNome(filtro), pageableTraduzido);
+		}
+		else
+		modelosPage = modeloRepository.findAll(pageable);
+		
+		
+		modelosPage = new PageWrapper<>(modelosPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(modelosPage, modeloModelAssembler);
 	}
+	
 	
 	@CheckSecurity.Modelos.PodeConsultar
 	@Override
@@ -94,6 +118,15 @@ public class ModeloController implements ModeloControllerOpenApi {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long modeloId) {
 		cadastroModelo.excluir(modeloId);	
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "codigo",
+				"nome", "nome"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }

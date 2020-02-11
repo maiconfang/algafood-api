@@ -11,6 +11,9 @@ import lombok.Setter;
 @Getter
 public class UsuarioInput {
 
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
+	
 	@ApiModelProperty(example = "João da Silva", required = true)
 	@NotBlank
 	private String nome;
@@ -19,5 +22,9 @@ public class UsuarioInput {
 	@NotBlank
 	@Email
 	private String email;
+	
+	// as duas linhas abaixo não tem no código fonte original, foi feito isso para poder salvar no angular
+	@ApiModelProperty(example = "123")
+	private String senha;
 	
 }

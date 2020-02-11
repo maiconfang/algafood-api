@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Modelo {
 
-	@NotNull(groups = Groups.EstadoId.class)
+	@NotNull(groups = Groups.ModeloId.class)
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
