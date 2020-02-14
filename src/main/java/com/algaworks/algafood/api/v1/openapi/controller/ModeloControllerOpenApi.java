@@ -19,7 +19,6 @@ public interface ModeloControllerOpenApi {
 
 	@ApiOperation("Lista os modelos")
 	PagedModel<ModeloModel> listar(ModeloFilter filtro, Pageable pageable);
-	//PagedModel<ModeloModel> pesquisar(ModeloFilter filtro, Pageable pageable);
 
 	@ApiOperation("Busca um modelo por ID")
 	@ApiResponses({

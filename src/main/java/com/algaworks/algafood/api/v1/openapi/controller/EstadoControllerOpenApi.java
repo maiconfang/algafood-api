@@ -1,10 +1,12 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.EstadoModel;
 import com.algaworks.algafood.api.v1.model.input.EstadoInput;
+import com.algaworks.algafood.domain.filter.EstadoFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,8 @@ import io.swagger.annotations.ApiResponses;
 public interface EstadoControllerOpenApi {
 
 	@ApiOperation("Lista os estados")
-	CollectionModel<EstadoModel> listar();
+	
+	PagedModel<EstadoModel> listar(EstadoFilter filtro, Pageable pageable);
 
 	@ApiOperation("Busca um estado por ID")
 	@ApiResponses({

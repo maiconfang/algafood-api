@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -70,7 +69,6 @@ public class ModeloController implements ModeloControllerOpenApi {
 		else
 		modelosPage = modeloRepository.findAll(pageable);
 		
-		
 		modelosPage = new PageWrapper<>(modelosPage, pageable);
 		
 		return pagedResourcesAssembler.toModel(modelosPage, modeloModelAssembler);
@@ -101,8 +99,7 @@ public class ModeloController implements ModeloControllerOpenApi {
 	@CheckSecurity.Modelos.PodeEditar
 	@Override
 	@PutMapping("/{modeloId}")
-	public ModeloModel atualizar(@PathVariable Long modeloId,
-			@RequestBody @Valid ModeloInput modeloInput) {
+	public ModeloModel atualizar(@PathVariable Long modeloId, @RequestBody @Valid ModeloInput modeloInput) {
 		Modelo modeloAtual = cadastroModelo.buscarOuFalhar(modeloId);
 		
 		modeloInputDisassembler.copyToDomainObject(modeloInput, modeloAtual);
@@ -122,7 +119,7 @@ public class ModeloController implements ModeloControllerOpenApi {
 	
 	private Pageable traduzirPageable(Pageable apiPageable) {
 		var mapeamento = Map.of(
-				"id", "codigo",
+				"id", "código",
 				"nome", "nome"
 			);
 		
