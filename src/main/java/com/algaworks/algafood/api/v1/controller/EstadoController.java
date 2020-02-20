@@ -69,7 +69,6 @@ public class EstadoController implements EstadoControllerOpenApi {
 		else
 			estadosPage = estadoRepository.findAll(pageable);
 		
-		
 		estadosPage = new PageWrapper<>(estadosPage, pageable);
 		
 		return pagedResourcesAssembler.toModel(estadosPage, estadoModelAssembler);

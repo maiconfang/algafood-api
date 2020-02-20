@@ -1,11 +1,14 @@
 package com.algaworks.algafood.api.v1.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +27,14 @@ import com.algaworks.algafood.api.v1.model.input.SenhaInput;
 import com.algaworks.algafood.api.v1.model.input.UsuarioComSenhaInput;
 import com.algaworks.algafood.api.v1.model.input.UsuarioInput;
 import com.algaworks.algafood.api.v1.openapi.controller.UsuarioControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
+import com.algaworks.algafood.domain.filter.UsuarioFilter;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.UsuarioRepository;
 import com.algaworks.algafood.domain.service.CadastroUsuarioService;
+import com.algaworks.algafood.infrastructure.repository.spec.UsuarioSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/usuarios", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,13 +52,26 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	@Autowired
 	private UsuarioInputDisassembler usuarioInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<Usuario> pagedResourcesAssembler;
+	
 	@CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
 	@Override
 	@GetMapping
-	public CollectionModel<UsuarioModel> listar() {
-		List<Usuario> todasUsuarios = usuarioRepository.findAll();
+	public PagedModel<UsuarioModel> listar(UsuarioFilter filtro, Pageable pageable) {
 		
-		return usuarioModelAssembler.toCollectionModel(todasUsuarios);
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<Usuario> usuariosPage = null;
+		
+		if(filtro.getNome()!=null || filtro.getEmail()!=null ) {
+			usuariosPage = usuarioRepository.findAll(UsuarioSpecs.comNomeOrEmailOrAnd(filtro), pageableTraduzido);
+		}
+		else
+		usuariosPage = usuarioRepository.findAll(pageable);
+		
+		usuariosPage = new PageWrapper<>(usuariosPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(usuariosPage, usuarioModelAssembler);
 	}
 	
 	@CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
@@ -69,21 +89,22 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	public UsuarioModel adicionar(@RequestBody @Valid UsuarioComSenhaInput usuarioInput) {
 		Usuario usuario = usuarioInputDisassembler.toDomainObject(usuarioInput);
 		usuario = cadastroUsuario.salvar(usuario);
-		
+		 
 		return usuarioModelAssembler.toModel(usuario);
 	}
 	
 	@CheckSecurity.UsuariosGruposPermissoes.PodeAlterarUsuario
 	@Override
 	@PutMapping("/{usuarioId}")
-	public UsuarioModel atualizar(@PathVariable Long usuarioId,	@RequestBody @Valid UsuarioInput usuarioInput) {
+	public UsuarioModel atualizar(@PathVariable Long usuarioId,
+			@RequestBody @Valid UsuarioInput usuarioInput) {
 		Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(usuarioId);
 		usuarioInputDisassembler.copyToDomainObject(usuarioInput, usuarioAtual);
 		usuarioAtual = cadastroUsuario.salvar(usuarioAtual);
 		
 		return usuarioModelAssembler.toModel(usuarioAtual);
 	}
-	
+
 	@CheckSecurity.UsuariosGruposPermissoes.PodeAlterarPropriaSenha
 	@Override
 	@PutMapping("/{usuarioId}/senha")
@@ -91,5 +112,16 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	public void alterarSenha(@PathVariable Long usuarioId, @RequestBody @Valid SenhaInput senha) {
 		cadastroUsuario.alterarSenha(usuarioId, senha.getSenhaAtual(), senha.getNovaSenha());
 	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"login", "login",
+				"email", "e-mail"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
+	}
+	
 	
 }

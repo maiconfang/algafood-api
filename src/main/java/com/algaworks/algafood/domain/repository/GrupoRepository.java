@@ -1,11 +1,16 @@
 package com.algaworks.algafood.domain.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.algaworks.algafood.domain.model.Grupo;
 
 @Repository
-public interface GrupoRepository extends JpaRepository<Grupo, Long> {
+public interface GrupoRepository extends CustomJpaRepository<Grupo, Long>, JpaSpecificationExecutor<Grupo> {
+	
+	
+	List<Grupo> findAll();
 
 }

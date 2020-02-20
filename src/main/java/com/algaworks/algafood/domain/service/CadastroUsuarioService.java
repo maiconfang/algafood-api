@@ -48,7 +48,7 @@ public class CadastroUsuarioService {
 		Usuario usuario = buscarOuFalhar(usuarioId);
 		
 		if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
-			throw new NegocioException("Senha atual informada não coincide com a senha do usuário.");
+			throw new NegocioException("Senha atual informada não coincide com a senha do usuário");
 		}
 		
 		usuario.setSenha(passwordEncoder.encode(novaSenha));

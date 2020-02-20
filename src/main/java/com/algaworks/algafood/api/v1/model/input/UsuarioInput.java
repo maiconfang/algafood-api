@@ -23,8 +23,4 @@ public class UsuarioInput {
 	@Email
 	private String email;
 	
-	// as duas linhas abaixo não tem no código fonte original, foi feito isso para poder salvar no angular
-	@ApiModelProperty(example = "123")
-	private String senha;
-	
 }

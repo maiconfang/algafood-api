@@ -18,6 +18,9 @@ public class CadastroGrupoService {
 	private static final String MSG_GRUPO_EM_USO 
 		= "Grupo de código %d não pode ser removido, pois está em uso";
 	
+	private static final String MSG_GRUPO_EM_USO_NOME 
+	= "Grupo com nome \""+ "%s" +"\" não pode ser removido, pois está em uso";
+	
 	@Autowired
 	private GrupoRepository grupoRepository;
 	
@@ -30,7 +33,7 @@ public class CadastroGrupoService {
 	}
 	
 	@Transactional
-	public void excluir(Long grupoId) {
+	public void excluir(Long grupoId, String nomeGrupo) {
 		try {
 			grupoRepository.deleteById(grupoId);
 			grupoRepository.flush();
@@ -40,7 +43,7 @@ public class CadastroGrupoService {
 		
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(
-				String.format(MSG_GRUPO_EM_USO, grupoId));
+				String.format(MSG_GRUPO_EM_USO_NOME, nomeGrupo));
 		}
 	}
 

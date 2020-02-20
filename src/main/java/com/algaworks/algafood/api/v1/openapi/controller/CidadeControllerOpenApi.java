@@ -1,10 +1,12 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.CidadeModel;
 import com.algaworks.algafood.api.v1.model.input.CidadeInput;
+import com.algaworks.algafood.domain.filter.CidadeFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,7 @@ import io.swagger.annotations.ApiResponses;
 public interface CidadeControllerOpenApi {
 
 	@ApiOperation("Lista as cidades")
-	CollectionModel<CidadeModel> listar();
+	PagedModel<CidadeModel> listar(CidadeFilter filtro, Pageable pageable);
 	
 	@ApiOperation("Busca uma cidade por ID")
 	@ApiResponses({

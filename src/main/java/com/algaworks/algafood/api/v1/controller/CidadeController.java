@@ -1,11 +1,14 @@
 package com.algaworks.algafood.api.v1.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,12 +27,16 @@ import com.algaworks.algafood.api.v1.assembler.CidadeModelAssembler;
 import com.algaworks.algafood.api.v1.model.CidadeModel;
 import com.algaworks.algafood.api.v1.model.input.CidadeInput;
 import com.algaworks.algafood.api.v1.openapi.controller.CidadeControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
 import com.algaworks.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.filter.CidadeFilter;
 import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.repository.CidadeRepository;
 import com.algaworks.algafood.domain.service.CadastroCidadeService;
+import com.algaworks.algafood.infrastructure.repository.spec.CidadeSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/cidades", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,14 +54,28 @@ public class CidadeController implements CidadeControllerOpenApi {
 	@Autowired
 	private CidadeInputDisassembler cidadeInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<Cidade> pagedResourcesAssembler;
+	
 	@CheckSecurity.Cidades.PodeConsultar
 	@Override
 	@GetMapping
-	public CollectionModel<CidadeModel> listar() {
-		List<Cidade> todasCidades = cidadeRepository.findAll();
+	public PagedModel<CidadeModel> listar(CidadeFilter filtro, Pageable pageable) {
 		
-		return cidadeModelAssembler.toCollectionModel(todasCidades);
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<Cidade> cidadesPage = null;
+		
+		if(filtro.getNome()!=null ) {
+			cidadesPage = cidadeRepository.findAll(CidadeSpecs.comNome(filtro), pageableTraduzido);
+		}
+		else
+			cidadesPage = cidadeRepository.findAll(pageable);
+		
+		cidadesPage = new PageWrapper<>(cidadesPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(cidadesPage, cidadeModelAssembler);
 	}
+	
 	
 	@CheckSecurity.Cidades.PodeConsultar
 	@Override
@@ -108,7 +129,20 @@ public class CidadeController implements CidadeControllerOpenApi {
 	@DeleteMapping("/{cidadeId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long cidadeId) {
-		cadastroCidade.excluir(cidadeId);	
+		
+		Cidade cidade = cadastroCidade.buscarOuFalhar(cidadeId);
+		String nomeCidade = cidade.getNome();
+		
+		cadastroCidade.excluir(cidadeId, nomeCidade);	
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"nome", "nome"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }
