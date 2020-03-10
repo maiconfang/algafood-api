@@ -10,7 +10,6 @@ import com.algaworks.algafood.domain.model.Modelo;
 @Repository
 public interface ModeloRepository extends CustomJpaRepository<Modelo, Long>, JpaSpecificationExecutor<Modelo> {
 	
-	
 	List<Modelo> findAll();
 
 }

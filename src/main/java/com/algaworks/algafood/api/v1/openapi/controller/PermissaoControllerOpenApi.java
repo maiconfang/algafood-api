@@ -1,8 +1,10 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.v1.model.PermissaoModel;
+import com.algaworks.algafood.domain.filter.PermissaoFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +13,6 @@ import io.swagger.annotations.ApiOperation;
 public interface PermissaoControllerOpenApi {
 
 	@ApiOperation("Lista as permissões")
-	CollectionModel<PermissaoModel> listar();
+	PagedModel<PermissaoModel> listar(PermissaoFilter filtro, Pageable pageable);
 	
 }

@@ -1,10 +1,12 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.FuncionarioModel;
 import com.algaworks.algafood.api.v1.model.input.FuncionarioInput;
+import com.algaworks.algafood.domain.filter.FuncionarioFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,7 @@ import io.swagger.annotations.ApiResponses;
 public interface FuncionarioControllerOpenApi {
 
 	@ApiOperation("Lista os funcionários")
-	CollectionModel<FuncionarioModel> listar();
+	PagedModel<FuncionarioModel> listar(FuncionarioFilter filtro, Pageable pageable);
 	
 	@ApiOperation("Busca um funcionário por ID")
 	@ApiResponses({

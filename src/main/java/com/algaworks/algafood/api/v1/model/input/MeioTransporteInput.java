@@ -11,6 +11,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class MeioTransporteInput {
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
 
 	@ApiModelProperty(example = "Palio SL", required = true)
 	@NotBlank

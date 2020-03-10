@@ -157,8 +157,7 @@ public @interface CheckSecurity {
 	
 	public @interface UsuariosGruposPermissoes {
 		
-		@PreAuthorize("hasAuthority('SCOPE_WRITE') and "
-				+ "@algaSecurity.usuarioAutenticadoIgual(#usuarioId)")
+		@PreAuthorize("hasAuthority('SCOPE_WRITE') and @algaSecurity.usuarioAutenticadoIgual(#usuarioId)")
 		@Retention(RUNTIME)
 		@Target(METHOD)
 		public @interface PodeAlterarPropriaSenha { }

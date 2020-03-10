@@ -11,6 +11,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FuncionarioInput {
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
 
 	@ApiModelProperty(example = "Alexander", required = true)
 	@NotBlank

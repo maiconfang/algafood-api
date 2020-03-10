@@ -1,11 +1,14 @@
 package com.algaworks.algafood.api.v1.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,14 +27,18 @@ import com.algaworks.algafood.api.v1.assembler.MeioTransporteModelAssembler;
 import com.algaworks.algafood.api.v1.model.MeioTransporteModel;
 import com.algaworks.algafood.api.v1.model.input.MeioTransporteInput;
 import com.algaworks.algafood.api.v1.openapi.controller.MeioTransporteControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
 import com.algaworks.algafood.domain.exception.FuncionarioNaoEncontradoException;
 import com.algaworks.algafood.domain.exception.ModeloNaoEncontradoException;
 import com.algaworks.algafood.domain.exception.NegocioException;
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
+import com.algaworks.algafood.domain.filter.MeioTransporteFilter;
 import com.algaworks.algafood.domain.model.MeioTransporte;
 import com.algaworks.algafood.domain.repository.MeioTransporteRepository;
 import com.algaworks.algafood.domain.service.CadastroMeioTransporteService;
+import com.algaworks.algafood.infrastructure.repository.spec.MeioTransporteSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/meios-transporte", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,6 +56,10 @@ public class MeioTransporteController implements MeioTransporteControllerOpenApi
 	@Autowired
 	private MeioTransporteInputDisassembler meioTransporteInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<MeioTransporte> pagedResourcesAssembler;
+	
+	/*
 	@CheckSecurity.MeiosTransporte.PodeConsultar
 	@Override
 	@GetMapping
@@ -56,6 +67,25 @@ public class MeioTransporteController implements MeioTransporteControllerOpenApi
 		List<MeioTransporte> todosMeiosTransportes = meioTransporteRepository.findAll();
 		
 		return meioTransporteModelAssembler.toCollectionModel(todosMeiosTransportes);
+	}
+	*/
+	@CheckSecurity.MeiosTransporte.PodeConsultar
+	@Override
+	@GetMapping
+	public PagedModel<MeioTransporteModel> listar(MeioTransporteFilter filtro, Pageable pageable) {
+		
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<MeioTransporte> meioTransportesPage = null;
+		
+		if(filtro.getNome()!=null ) {
+			meioTransportesPage = meioTransporteRepository.findAll(MeioTransporteSpecs.comNome(filtro), pageableTraduzido);
+		}
+		else
+			meioTransportesPage = meioTransporteRepository.findAll(pageable);
+		
+		meioTransportesPage = new PageWrapper<>(meioTransportesPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(meioTransportesPage, meioTransporteModelAssembler);
 	}
 	
 	@CheckSecurity.MeiosTransporte.PodeConsultar
@@ -123,6 +153,15 @@ public class MeioTransporteController implements MeioTransporteControllerOpenApi
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long meioTransporteId) {
 		cadastroMeioTransporte.excluir(meioTransporteId);	
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"nome", "nome"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }

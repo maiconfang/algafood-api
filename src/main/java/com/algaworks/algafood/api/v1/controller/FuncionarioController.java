@@ -1,11 +1,14 @@
 package com.algaworks.algafood.api.v1.controller;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,10 +27,14 @@ import com.algaworks.algafood.api.v1.assembler.FuncionarioModelAssembler;
 import com.algaworks.algafood.api.v1.model.FuncionarioModel;
 import com.algaworks.algafood.api.v1.model.input.FuncionarioInput;
 import com.algaworks.algafood.api.v1.openapi.controller.FuncionarioControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
+import com.algaworks.algafood.domain.filter.FuncionarioFilter;
 import com.algaworks.algafood.domain.model.Funcionario;
 import com.algaworks.algafood.domain.repository.FuncionarioRepository;
 import com.algaworks.algafood.domain.service.CadastroFuncionarioService;
+import com.algaworks.algafood.infrastructure.repository.spec.FuncionarioSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/funcionario", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,13 +52,26 @@ public class FuncionarioController implements FuncionarioControllerOpenApi {
 	@Autowired
 	private FuncionarioInputDisassembler funcionarioInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<Funcionario> pagedResourcesAssembler;
+	
 	@CheckSecurity.Funcionarios.PodeConsultar
 	@Override
 	@GetMapping
-	public CollectionModel<FuncionarioModel> listar() {
-		List<Funcionario> todosFuncionarios = funcionarioRepository.findAll();
+	public PagedModel<FuncionarioModel> listar(FuncionarioFilter filtro, Pageable pageable) {
 		
-		return funcionarioModelAssembler.toCollectionModel(todosFuncionarios);
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<Funcionario> funcionariosPage = null;
+		
+		if(filtro.getNome()!=null ) {
+			funcionariosPage = funcionarioRepository.findAll(FuncionarioSpecs.comNome(filtro), pageableTraduzido);
+		}
+		else
+			funcionariosPage = funcionarioRepository.findAll(pageable);
+		
+		funcionariosPage = new PageWrapper<>(funcionariosPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(funcionariosPage, funcionarioModelAssembler);
 	}
 	
 	@CheckSecurity.Funcionarios.PodeConsultar
@@ -101,6 +121,17 @@ public class FuncionarioController implements FuncionarioControllerOpenApi {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long funcionarioId) {
 		cadastroFuncionario.excluir(funcionarioId);	
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"nome", "nome",
+				"rg", "rg",
+				"cpf", "cpf" 
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }

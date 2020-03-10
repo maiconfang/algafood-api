@@ -264,15 +264,15 @@ insert into modelo (id, nome) values (9, 'Quadraciclo');
 
 insert into funcionario (id, nome, rg, cpf, data_atualizacao, data_cadastro, endereco_cidade_id, endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro) 
 values 
-(1, 'Beatriz', '19.117.826-3' ,'830.941.180-46', utc_timestamp, '2020-02-01 02:20:10', 1, '38400-999', 'Rua João Pinheiro', '1000', 'Centro');
+(1, 'Beatriz', '19.117.826-3' ,'818.554.847-14', utc_timestamp, '2020-02-01 02:20:10', 1, '83323-240', 'Rua João Pinheiro', '1000', 'Centro');
 
 insert into funcionario (id, nome, rg, cpf, data_atualizacao, data_cadastro, endereco_cidade_id, endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro) 
 values 
-(2, 'Luana', '78.852.159-7' ,'753.761.748-12', utc_timestamp, '2020-02-01 02:20:10', 1, '85200-751', 'Rua Maria', '8547', 'Jardins');
+(2, 'Luana', '78.852.159-7' ,'386.887.195-00', utc_timestamp, '2020-02-01 02:20:10', 1, '85852-010', 'Rua Maria', '8547', 'Jardins');
 
 insert into funcionario (id, nome, rg, cpf, data_atualizacao, data_cadastro, endereco_cidade_id, endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro) 
 values 
-(3, 'Katia', '89.148.559-2' ,'963.852.852-74', utc_timestamp, '2020-02-01 02:20:10', 1, '74517-751', 'Avenida Brazil', '741', 'Erva doce');
+(3, 'Katia', '89.148.559-2' ,'577.863.756-00', utc_timestamp, '2020-02-01 02:20:10', 1, '85892-000', 'Avenida Brazil', '741', 'Erva doce');
 
 
 insert into meio_transporte (id, nome, cor, ano, placa, modelo_id, restaurante_id, funcionario_id, data_atualizacao, data_cadastro) 

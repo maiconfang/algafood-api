@@ -1,10 +1,12 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.MeioTransporteModel;
 import com.algaworks.algafood.api.v1.model.input.MeioTransporteInput;
+import com.algaworks.algafood.domain.filter.MeioTransporteFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,7 @@ import io.swagger.annotations.ApiResponses;
 public interface MeioTransporteControllerOpenApi {
 
 	@ApiOperation("Lista os meios de transporte")
-	CollectionModel<MeioTransporteModel> listar();
+	PagedModel<MeioTransporteModel> listar(MeioTransporteFilter filtro, Pageable pageable);
 	
 	@ApiOperation("Busca um meio de transporte por ID")
 	@ApiResponses({

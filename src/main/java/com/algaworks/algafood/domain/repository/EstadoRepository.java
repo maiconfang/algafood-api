@@ -10,7 +10,6 @@ import com.algaworks.algafood.domain.model.Estado;
 @Repository
 public interface EstadoRepository  extends CustomJpaRepository<Estado, Long>, JpaSpecificationExecutor<Estado> {
 	
-	
 	List<Estado> findAll();
 
 }

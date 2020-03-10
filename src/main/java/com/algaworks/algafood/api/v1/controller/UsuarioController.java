@@ -122,6 +122,5 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 		
 		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
-	
-	
+
 }
