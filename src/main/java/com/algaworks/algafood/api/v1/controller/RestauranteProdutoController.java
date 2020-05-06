@@ -61,7 +61,7 @@ public class RestauranteProdutoController implements RestauranteProdutoControlle
 			@RequestParam(required = false, defaultValue = "false") Boolean incluirInativos) {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
 		
-		List<Produto> todosProdutos = null;
+		List<Produto> todosProdutos = null; 
 		
 		if (incluirInativos) {
 			todosProdutos = produtoRepository.findTodosByRestaurante(restaurante);

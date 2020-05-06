@@ -120,6 +120,9 @@ insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Mur
 
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Bife Ancho', 'Corte macio e suculento, com dois dedos de espessura, retirado da parte dianteira do contrafilé', 79, 1, 4);
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('T-Bone', 'Corte muito saboroso, com um osso em formato de T, sendo de um lado o contrafilé e do outro o filé mignon', 89, 1, 4);
+insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Porção de fritas', 'Batata tradicional com sal', 21, 1, 4);
+insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Macarão alho e olho', 'Macarão integral com alho frito', 43, 1, 4);
+
 
 insert into produto (nome, descricao, preco, ativo, restaurante_id) values ('Sanduíche X-Tudo', 'Sandubão com muito queijo, hamburger bovino, bacon, ovo, salada e maionese', 19, 1, 5);
 

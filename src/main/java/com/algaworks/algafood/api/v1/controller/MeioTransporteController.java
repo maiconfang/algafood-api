@@ -59,16 +59,6 @@ public class MeioTransporteController implements MeioTransporteControllerOpenApi
 	@Autowired
 	private PagedResourcesAssembler<MeioTransporte> pagedResourcesAssembler;
 	
-	/*
-	@CheckSecurity.MeiosTransporte.PodeConsultar
-	@Override
-	@GetMapping
-	public CollectionModel<MeioTransporteModel> listar() {
-		List<MeioTransporte> todosMeiosTransportes = meioTransporteRepository.findAll();
-		
-		return meioTransporteModelAssembler.toCollectionModel(todosMeiosTransportes);
-	}
-	*/
 	@CheckSecurity.MeiosTransporte.PodeConsultar
 	@Override
 	@GetMapping

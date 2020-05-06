@@ -6,12 +6,16 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 public class PedidoInput {
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
 
 	@Valid
 	@NotNull

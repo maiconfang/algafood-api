@@ -1,11 +1,15 @@
 package com.algaworks.algafood.api.v1.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,23 +23,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.v1.assembler.RestauranteApenasNomeModelAssembler;
-import com.algaworks.algafood.api.v1.assembler.RestauranteBasicoModelAssembler;
 import com.algaworks.algafood.api.v1.assembler.RestauranteInputDisassembler;
 import com.algaworks.algafood.api.v1.assembler.RestauranteModelAssembler;
-import com.algaworks.algafood.api.v1.model.RestauranteApenasNomeModel;
-import com.algaworks.algafood.api.v1.model.RestauranteBasicoModel;
 import com.algaworks.algafood.api.v1.model.RestauranteModel;
 import com.algaworks.algafood.api.v1.model.input.RestauranteInput;
 import com.algaworks.algafood.api.v1.openapi.controller.RestauranteControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
 import com.algaworks.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
+import com.algaworks.algafood.domain.filter.RestauranteFilter;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
+import com.algaworks.algafood.infrastructure.repository.spec.RestauranteSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/restaurantes", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,29 +55,10 @@ public class RestauranteController implements RestauranteControllerOpenApi {
 	private RestauranteModelAssembler restauranteModelAssembler;
 	
 	@Autowired
-	private RestauranteBasicoModelAssembler restauranteBasicoModelAssembler;
-	
-	@Autowired
-	private RestauranteApenasNomeModelAssembler restauranteApenasNomeModelAssembler;
-	
-	@Autowired
 	private RestauranteInputDisassembler restauranteInputDisassembler;
 	
-	@CheckSecurity.Restaurantes.PodeConsultar
-	@Override
-	@GetMapping
-	public CollectionModel<RestauranteBasicoModel> listar() {
-		return restauranteBasicoModelAssembler
-				.toCollectionModel(restauranteRepository.findAll());
-	}
-	
-	@CheckSecurity.Restaurantes.PodeConsultar
-	@Override
-	@GetMapping(params = "projecao=apenas-nome")
-	public CollectionModel<RestauranteApenasNomeModel> listarApenasNomes() {
-		return restauranteApenasNomeModelAssembler
-				.toCollectionModel(restauranteRepository.findAll());
-	}
+	@Autowired
+	private PagedResourcesAssembler<Restaurante> pagedResourcesAssembler;
 	
 	@CheckSecurity.Restaurantes.PodeConsultar
 	@Override
@@ -82,6 +67,25 @@ public class RestauranteController implements RestauranteControllerOpenApi {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
 		
 		return restauranteModelAssembler.toModel(restaurante);
+	}
+	
+	@CheckSecurity.Restaurantes.PodeConsultar
+	@Override
+	@GetMapping
+	public PagedModel<RestauranteModel> listar(RestauranteFilter filtro, Pageable pageable) {
+		
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<Restaurante> restaurantesPage = null;
+		
+		if(filtro.getNome()!=null ) {
+			restaurantesPage = restauranteRepository.findAll(RestauranteSpecs.comNome(filtro), pageableTraduzido);
+		}
+		else
+			restaurantesPage = restauranteRepository.findAll(pageable);
+		
+		restaurantesPage = new PageWrapper<>(restaurantesPage, pageable);
+		
+		return pagedResourcesAssembler.toModel(restaurantesPage, restauranteModelAssembler);
 	}
 	
 	@CheckSecurity.Restaurantes.PodeGerenciarCadastro
@@ -176,6 +180,15 @@ public class RestauranteController implements RestauranteControllerOpenApi {
 		cadastroRestaurante.fechar(restauranteId);
 		
 		return ResponseEntity.noContent().build();
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"nome", "nome"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }

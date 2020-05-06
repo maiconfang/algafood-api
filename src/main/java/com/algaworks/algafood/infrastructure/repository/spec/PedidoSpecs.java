@@ -20,6 +20,14 @@ public class PedidoSpecs {
 			
 			var predicates = new ArrayList<Predicate>();
 			
+			if (filtro.getPedidoId() != null) {
+				predicates.add(builder.equal(root.get("id"), filtro.getPedidoId()));
+			}
+			
+			if (filtro.getCodigo() != null) {
+				predicates.add(builder.equal(root.get("codigo"), filtro.getCodigo()));
+			}
+			
 			if (filtro.getClienteId() != null) {
 				predicates.add(builder.equal(root.get("cliente"), filtro.getClienteId()));
 			}

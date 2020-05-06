@@ -1,5 +1,6 @@
 package com.algaworks.algafood.api.v1.model.input;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -19,6 +20,10 @@ public class ItemPedidoInput {
 	@NotNull
 	@PositiveOrZero
 	private Integer quantidade;
+	
+	@ApiModelProperty(example = "Espetinho de Cupim", required = true)
+	@NotBlank
+	private String nomeProduto;
 	
 	@ApiModelProperty(example = "Menos picante, por favor")
 	private String observacao;

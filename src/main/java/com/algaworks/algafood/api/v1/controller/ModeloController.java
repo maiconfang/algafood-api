@@ -41,89 +41,83 @@ public class ModeloController implements ModeloControllerOpenApi {
 
 	@Autowired
 	private ModeloRepository modeloRepository;
-	
+
 	@Autowired
 	private CadastroModeloService cadastroModelo;
-	
+
 	@Autowired
 	private ModeloModelAssembler modeloModelAssembler;
-	
+
 	@Autowired
 	private ModeloInputDisassembler modeloInputDisassembler;
-	
+
 	@Autowired
 	private PagedResourcesAssembler<Modelo> pagedResourcesAssembler;
-	
-	
+
 	@CheckSecurity.Modelos.PodeConsultar
 	@Override
 	@GetMapping
 	public PagedModel<ModeloModel> listar(ModeloFilter filtro, Pageable pageable) {
-		
+
 		Pageable pageableTraduzido = traduzirPageable(pageable);
 		Page<Modelo> modelosPage = null;
-		
-		if(filtro.getNome()!=null ) {
+
+		if (filtro.getNome() != null) {
 			modelosPage = modeloRepository.findAll(ModeloSpecs.comNome(filtro), pageableTraduzido);
-		}
-		else
-		modelosPage = modeloRepository.findAll(pageable);
-		
+		} else
+			modelosPage = modeloRepository.findAll(pageable);
+
 		modelosPage = new PageWrapper<>(modelosPage, pageable);
-		
+
 		return pagedResourcesAssembler.toModel(modelosPage, modeloModelAssembler);
 	}
-	
-	
+
 	@CheckSecurity.Modelos.PodeConsultar
 	@Override
 	@GetMapping("/{modeloId}")
 	public ModeloModel buscar(@PathVariable Long modeloId) {
 		Modelo modelo = cadastroModelo.buscarOuFalhar(modeloId);
-		
+
 		return modeloModelAssembler.toModel(modelo);
 	}
-	
+
 	@CheckSecurity.Modelos.PodeEditar
 	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ModeloModel adicionar(@RequestBody @Valid ModeloInput modeloInput) {
 		Modelo modelo = modeloInputDisassembler.toDomainObject(modeloInput);
-		
+
 		modelo = cadastroModelo.salvar(modelo);
-		
+
 		return modeloModelAssembler.toModel(modelo);
 	}
-	
+
 	@CheckSecurity.Modelos.PodeEditar
 	@Override
 	@PutMapping("/{modeloId}")
 	public ModeloModel atualizar(@PathVariable Long modeloId, @RequestBody @Valid ModeloInput modeloInput) {
 		Modelo modeloAtual = cadastroModelo.buscarOuFalhar(modeloId);
-		
+
 		modeloInputDisassembler.copyToDomainObject(modeloInput, modeloAtual);
-		
+
 		modeloAtual = cadastroModelo.salvar(modeloAtual);
-		
+
 		return modeloModelAssembler.toModel(modeloAtual);
 	}
-	
+
 	@CheckSecurity.Modelos.PodeEditar
 	@Override
 	@DeleteMapping("/{modeloId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long modeloId) {
-		cadastroModelo.excluir(modeloId);	
+		cadastroModelo.excluir(modeloId);
 	}
-	
+
 	private Pageable traduzirPageable(Pageable apiPageable) {
-		var mapeamento = Map.of(
-				"id", "código",
-				"nome", "nome"
-			);
-		
+		var mapeamento = Map.of("id", "código", "nome", "nome");
+
 		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
-	
+
 }

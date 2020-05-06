@@ -31,4 +31,8 @@ public class MeioTransporteInput {
 	@NotNull
 	private RestauranteIdInput restaurante;
 	
+	@Valid
+	@NotNull
+	private FuncionarioIdInput funcionario;
+	
 }

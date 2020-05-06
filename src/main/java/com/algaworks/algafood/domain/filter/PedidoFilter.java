@@ -12,6 +12,12 @@ import lombok.Setter;
 @Setter
 @Getter
 public class PedidoFilter {
+	
+	@ApiModelProperty(example = "1", value = "ID do pedido da pesquisa")
+	private Long pedidoId;
+	
+	@ApiModelProperty(example = "1", value = "Código do pedido da pesquisa")
+	private String codigo;
 
 	@ApiModelProperty(example = "1", value = "ID do cliente para filtro da pesquisa")
 	private Long clienteId;

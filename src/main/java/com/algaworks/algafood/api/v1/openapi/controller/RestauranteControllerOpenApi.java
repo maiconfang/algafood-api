@@ -2,37 +2,26 @@ package com.algaworks.algafood.api.v1.openapi.controller;
 
 import java.util.List;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
-import com.algaworks.algafood.api.v1.model.RestauranteApenasNomeModel;
-import com.algaworks.algafood.api.v1.model.RestauranteBasicoModel;
 import com.algaworks.algafood.api.v1.model.RestauranteModel;
 import com.algaworks.algafood.api.v1.model.input.RestauranteInput;
+import com.algaworks.algafood.domain.filter.RestauranteFilter;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "Restaurantes")
 public interface RestauranteControllerOpenApi {
 
 	@ApiOperation(value = "Lista restaurantes")
-	@ApiImplicitParams({
-		@ApiImplicitParam(value = "Nome da projeção de pedidos", allowableValues = "apenas-nome",
-				name = "projecao", paramType = "query", type = "string")
-	})
-	CollectionModel<RestauranteBasicoModel> listar();
-	
-	@ApiIgnore
-	@ApiOperation(value = "Lista restaurantes", hidden = true)
-	CollectionModel<RestauranteApenasNomeModel> listarApenasNomes();
+	PagedModel<RestauranteModel> listar(RestauranteFilter filtro, Pageable pageable);
 	
 	@ApiOperation("Busca um restaurante por ID")
 	@ApiResponses({

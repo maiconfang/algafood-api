@@ -14,6 +14,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RestauranteInput {
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
 
 	@ApiModelProperty(example = "Thai Gourmet", required = true)
 	@NotBlank

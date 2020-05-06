@@ -1,13 +1,16 @@
 package com.algaworks.algafood.api.v1.controller;
 
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,10 +32,14 @@ import com.algaworks.algafood.api.v1.assembler.FormaPagamentoModelAssembler;
 import com.algaworks.algafood.api.v1.model.FormaPagamentoModel;
 import com.algaworks.algafood.api.v1.model.input.FormaPagamentoInput;
 import com.algaworks.algafood.api.v1.openapi.controller.FormaPagamentoControllerOpenApi;
+import com.algaworks.algafood.core.data.PageWrapper;
+import com.algaworks.algafood.core.data.PageableTranslator;
 import com.algaworks.algafood.core.security.CheckSecurity;
+import com.algaworks.algafood.domain.filter.FormaPagamentoFilter;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.repository.FormaPagamentoRepository;
 import com.algaworks.algafood.domain.service.CadastroFormaPagamentoService;
+import com.algaworks.algafood.infrastructure.repository.spec.FormaPagamentoSpecs;
 
 @RestController
 @RequestMapping(path = "/v1/formas-pagamento", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,34 +57,29 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 	@Autowired
 	private FormaPagamentoInputDisassembler formaPagamentoInputDisassembler;
 	
+	@Autowired
+	private PagedResourcesAssembler<FormaPagamento> pagedResourcesAssembler;
+	
+	
 	@CheckSecurity.FormasPagamento.PodeConsultar
 	@Override
 	@GetMapping
-	public ResponseEntity<CollectionModel<FormaPagamentoModel>> listar(ServletWebRequest request) {
-		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
+	public PagedModel<FormaPagamentoModel> listar(FormaPagamentoFilter filtro, Pageable pageable) {
 		
-		String eTag = "0";
+		Pageable pageableTraduzido = traduzirPageable(pageable);
+		Page<FormaPagamento> FormaPagamentosPage = null;
 		
-		OffsetDateTime dataUltimaAtualizacao = formaPagamentoRepository.getDataUltimaAtualizacao();
-		
-		if (dataUltimaAtualizacao != null) {
-			eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+		if(filtro.getDescricao()!=null ) {
+			FormaPagamentosPage = formaPagamentoRepository.findAll(FormaPagamentoSpecs.comDescricao(filtro), pageableTraduzido);
 		}
+		else
+			FormaPagamentosPage = formaPagamentoRepository.findAll(pageable);
 		
-		if (request.checkNotModified(eTag)) {
-			return null;
-		}
+		FormaPagamentosPage = new PageWrapper<>(FormaPagamentosPage, pageable);
 		
-		List<FormaPagamento> todasFormasPagamentos = formaPagamentoRepository.findAll();
-		
-		CollectionModel<FormaPagamentoModel> formasPagamentosModel = 
-				formaPagamentoModelAssembler.toCollectionModel(todasFormasPagamentos);
-		
-		return ResponseEntity.ok()
-				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS).cachePublic())
-				.eTag(eTag)
-				.body(formasPagamentosModel);
+		return pagedResourcesAssembler.toModel(FormaPagamentosPage, formaPagamentoModelAssembler);
 	}
+	
 	
 	@CheckSecurity.FormasPagamento.PodeConsultar
 	@Override
@@ -142,6 +144,15 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long formaPagamentoId) {
 		cadastroFormaPagamento.excluir(formaPagamentoId);	
+	}
+	
+	private Pageable traduzirPageable(Pageable apiPageable) {
+		var mapeamento = Map.of(
+				"id", "código",
+				"descricao", "descrição"
+			);
+		
+		return PageableTranslator.translate(apiPageable, mapeamento);
 	}
 	
 }

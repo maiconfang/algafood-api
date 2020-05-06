@@ -1,13 +1,14 @@
 package com.algaworks.algafood.api.v1.openapi.controller;
 
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.algaworks.algafood.api.exceptionhandler.Problem;
 import com.algaworks.algafood.api.v1.model.FormaPagamentoModel;
 import com.algaworks.algafood.api.v1.model.input.FormaPagamentoInput;
-import com.algaworks.algafood.api.v1.openapi.model.FormasPagamentoModelOpenApi;
+import com.algaworks.algafood.domain.filter.FormaPagamentoFilter;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,8 +19,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(tags = "Formas de pagamento")
 public interface FormaPagamentoControllerOpenApi {
 
-	@ApiOperation(value = "Lista as formas de pagamento", response = FormasPagamentoModelOpenApi.class)
-	ResponseEntity<CollectionModel<FormaPagamentoModel>> listar(ServletWebRequest request);
+	PagedModel<FormaPagamentoModel> listar(FormaPagamentoFilter filtro, Pageable pageable);
 	
 	@ApiOperation("Busca uma forma de pagamento por ID")
 	@ApiResponses({

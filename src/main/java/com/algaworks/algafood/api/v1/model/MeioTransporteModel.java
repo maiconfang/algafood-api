@@ -18,6 +18,9 @@ public class MeioTransporteModel extends RepresentationModel<MeioTransporteModel
 	@ApiModelProperty(example = "Honda LX")
 	private String nome;
 	
+	@ApiModelProperty(example = "#a82a2a") 
+	private String cor;
+	
 	private ModeloModel modelo;
 	
 	private RestauranteApenasNomeModel restaurante;

@@ -13,6 +13,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ProdutoInput {
+	
+	@ApiModelProperty(example = "1", required = true)
+	private Long id;
 
 	@ApiModelProperty(example = "Espetinho de Cupim", required = true)
 	@NotBlank
